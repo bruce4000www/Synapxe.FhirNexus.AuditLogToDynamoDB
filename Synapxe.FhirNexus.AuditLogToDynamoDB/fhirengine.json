@@ -1,0 +1,44 @@
+{
+  "EnableHandlerAutoRegistration": true,
+  "PublicConformanceResources": true,
+  "UseFhirController": false,
+  "SystemPlugins": {
+    "Metadata": "Conformance",
+    "Merge": true,
+    "Validate": true,
+    "OpenTelemetryPrometheusMetrics": {
+      "AspNetCoreInstrumentation": true
+    },
+    "OpenTelemetryTracing": {
+      "ServiceName": true,
+      "AspNetCoreInstrumentation": true,
+      "SqlClientInstrumentation": {
+        "SetDbStatementForText": true
+      },
+      "OtlpExporter": true
+    },
+    "Authentication": "Synapxe.FhirNexus.AuditLogToDynamoDB.Security.HeadersAuthenticationHandler",
+    "ResourceRepositoryCache": {
+      "GlobalExpiration": "01:00:00",
+      "AllowCacheDisable": true
+    }
+  },
+  "Handlers": {
+    "Repository": {
+      "FhirDataStore<@NoSql>": {
+        "UseSqlDocument": {
+          "EnableRetryOnFailure": true,
+          "ReferencedTypes": [
+            "Patient",
+            "Practitioner"
+          ]
+        },
+        "IncludeStandardSearchParams": true,
+        "ConnectionString": "Local",
+        "AcceptedTypes": [
+          "Appointment"
+        ]
+      }
+    }
+  }
+}
