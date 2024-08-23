@@ -1,0 +1,47 @@
+{
+  "Enrich": [
+    "WithMachineName"
+  ],
+  "Inbound": {
+    "AuditTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Logs/inbound.txt",
+          "rollingInterval": "Day",
+          "formatter": {
+            "type": "Ihis.FhirEngine.Serilog.ExcludeBodyJsonFormatter, Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog"
+          }
+        }
+      }
+    ]
+  },
+  "Outbound": {
+    "AuditTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Logs/outbound.txt",
+          "rollingInterval": "Day",
+          "formatter": {
+            "type": "Ihis.FhirEngine.Serilog.ExcludeBodyJsonFormatter, Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog"
+          }
+        }
+      }
+    ]
+  },
+  "Application": {
+    "WriteTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Logs/application.txt",
+          "rollingInterval": "Day",
+          "formatter": {
+            "type": "Ihis.FhirEngine.Serilog.JsonFormatter, Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog"
+          }
+        }
+      }
+    ]
+  }
+}

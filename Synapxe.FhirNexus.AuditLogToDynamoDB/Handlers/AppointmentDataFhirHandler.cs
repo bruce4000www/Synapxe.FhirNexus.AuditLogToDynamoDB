@@ -17,13 +17,16 @@ namespace Synapxe.FhirNexus.AuditLogToDynamoDB.Handlers
     {
         private readonly IDataService dataStore;
         private readonly ISearchService searchService;
+        private readonly ILogger<AppointmentDataFhirHandler> logger; // Added ILogger field
 
         public AppointmentDataFhirHandler(
             IDataService<Appointment> dataStore,
-            ISearchService<Appointment> searchService)
+            ISearchService<Appointment> searchService,
+            ILogger<AppointmentDataFhirHandler> logger) // Added ILogger parameter
         {
             this.dataStore = dataStore;
             this.searchService = searchService;
+            this.logger = logger; // Assigned logger parameter to field
         }
 
         [FhirHandler(FhirInteractionType.OperationInstance, CustomOperation = "cancel")]
@@ -51,6 +54,7 @@ namespace Synapxe.FhirNexus.AuditLogToDynamoDB.Handlers
         [FhirHandler("ValidateNoAppointmentConflictOnCreate", HandlerCategory.PreCRUD, FhirInteractionType.Create)]
         public async Task ValidateNoAppointmentConflictAsync(Appointment appointment, CancellationToken cancellationToken)
         {
+            logger.LogInformation("Validating appointment conflict");
             // Check that all participants have no other appointments for the same time
             var participantIds = appointment.Participant.Select(x => x.Actor.Reference).ToList();
 
@@ -62,7 +66,6 @@ namespace Synapxe.FhirNexus.AuditLogToDynamoDB.Handlers
             };
 
             var result = await searchService.SearchAsync("Appointment", searchParams.ToArray(), false, cancellationToken);
-
             if (result.TotalCount > 0)
             {
                 throw new ResourceNotValidException("Appointment participant has another appointment for that date.");

@@ -1,0 +1,60 @@
+{
+  "Enrich": [
+    "WithMachineName"
+  ],
+  //"MinimumLevel": {
+  //  "Default": "Information",
+  //  "Override": {
+  //    "Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware": "Warning",
+  //    "Ihis.FhirEngine.WebApi.OutboundHttpClientAuditLogger": "Warning"
+  //  }
+  //},
+  "Inbound": {
+    "WriteTo": [
+      {
+        "Name": "AmazonCloudWatch",
+        "Args": {
+          "configuration": {
+            "LogStreamNamePrefix": "inbound",
+            "Region": "ap-southeast-1"
+          },
+          "textFormatter": {
+            "type": "Ihis.FhirEngine.Serilog.ExcludeBodyJsonFormatter, Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog"
+          }
+        }
+      }
+    ]
+  },
+  "Outbound": {
+    "WriteTo": [
+      {
+        "Name": "AmazonCloudWatch",
+        "Args": {
+          "configuration": {
+            "LogStreamNamePrefix": "outbound",
+            "Region": "ap-southeast-1"
+          },
+          "textFormatter": {
+            "type": "Ihis.FhirEngine.Serilog.ExcludeBodyJsonFormatter, Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog"
+          }
+        }
+      }
+    ]
+  },
+  "Application": {
+    "WriteTo": [
+      {
+        "Name": "AmazonCloudWatch",
+        "Args": {
+          "configuration": {
+            "LogStreamNamePrefix": "application",
+            "Region": "ap-southeast-1"
+          },
+          "textFormatter": {
+            "type": "Ihis.FhirEngine.Serilog.ExcludeBodyJsonFormatter, Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog"
+          }
+        }
+      }
+    ]
+  }
+}

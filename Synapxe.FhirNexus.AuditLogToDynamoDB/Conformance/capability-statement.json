@@ -135,6 +135,44 @@
             }
           ]
         },
+        {
+          "type": "Patient",
+          "interaction": [
+            {
+              "code": "read",
+              "documentation": "Retrieves an appointment resource by id."
+            },
+            {
+              "code": "vread",
+              "documentation": "Retrieves an appointment resource by id and version."
+            },
+            {
+              "code": "history-instance",
+              "documentation": "Searches the appointment resource instance version history."
+            },
+            {
+              "code": "history-type",
+              "documentation": "Searches the appointment resource version history."
+            },
+            {
+              "code": "create",
+              "documentation": "Creates an appointment resource."
+            },
+            {
+              "code": "update",
+              "documentation": "Updates an appointment resource."
+            },
+            {
+              "code": "patch",
+              "documentation": "Updates an appointment resource."
+            },
+            {
+              "code": "search-type",
+              "documentation": "Searches the appointment resource."
+            }
+          ],
+          "versioning": "versioned"
+        }
       ]
     }
   ]

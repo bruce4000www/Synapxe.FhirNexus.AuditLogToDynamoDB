@@ -38,6 +38,16 @@
         "AcceptedTypes": [
           "Appointment"
         ]
+      },
+      "FhirDataStore<@Patient>": {
+        "UseFhirRestApi": {
+          "UseLegacyClient": false,
+          "HealthEndpointGet": true
+        },
+        "ConnectionString": "Remote_Patient",
+        "AcceptedTypes": [
+          "Patient"
+        ]
       }
     }
   }

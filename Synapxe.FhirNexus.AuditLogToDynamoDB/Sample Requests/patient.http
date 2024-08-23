@@ -1,0 +1,46 @@
+@baseUrl=https://localhost:7276
+@applicationId=test-app
+
+# @name create patient request
+
+POST {{baseUrl}}/Patient
+X-Ihis-SourceApplication: {{applicationId}}
+Content-Type: application/fhir+json
+
+{
+    "resourceType": "Patient",
+    "identifier": [
+        {
+            "use": "usual",
+            "system": "urn:oid:1.2.36.146.595.217.0.1",
+            "value": "12345aaaaaaaaaaaaaaaaaaaaaa",
+            "period": {
+                "start": "2001-05-06"
+            },
+            "assigner": {
+                "display": "Acme Healthcare"
+            }
+        }
+    ],
+    "active": true,
+    "name": [
+        {
+            "use": "official",
+            "family": "Chalmers",
+            "given": [
+                "Peter",
+                "James"
+            ]
+        }
+    ],
+    "telecom": [
+        {
+            "system": "phone",
+            "value": "(03) 5555 6473",
+            "use": "work",
+            "rank": 1
+        }
+    ],
+    "gender": "male",
+    "birthDate": "1974-12-25"
+}

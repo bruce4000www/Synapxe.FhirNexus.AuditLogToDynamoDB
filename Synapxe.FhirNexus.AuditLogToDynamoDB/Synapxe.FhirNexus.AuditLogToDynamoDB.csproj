@@ -6,9 +6,6 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
-
-    <ItemGroup>
-    </ItemGroup>
     
     <ItemGroup>
     
@@ -16,8 +13,10 @@
         <PackageReference Include="Ihis.FhirEngine.Data.SqlServer.Extensions.Migration" Version="4.2.0-dev-24232.1" />
         <PackageReference Include="Ihis.FhirEngine.Extensions.OpenTelemetry" Version="4.2.0-dev-24232.1" />
         <PackageReference Include="Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog" Version="4.2.0-dev-24232.1" />
+        <PackageReference Include="Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog.Aws" Version="4.2.0-dev-24232.1" />
         <PackageReference Include="Ihis.FhirEngine.WebApi.Extensions.Swashbuckle" Version="4.2.0-dev-24232.1" />
         <PackageReference Include="Ihis.FhirEngine.WebApi.R5" Version="4.2.0-dev-24232.1" />
+        <PackageReference Include="Serilog.Sinks.AwsCloudWatch" Version="4.3.37" />
     </ItemGroup>
 
     <ItemGroup>

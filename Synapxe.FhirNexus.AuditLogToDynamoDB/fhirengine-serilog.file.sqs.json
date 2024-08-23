@@ -1,0 +1,83 @@
+{
+  "Enrich": [
+    "WithMachineName"
+  ],
+  //"MinimumLevel": {
+  //  "Default": "Information",
+  //  "Override": {
+  //    "Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware": "Warning",
+  //    "Ihis.FhirEngine.WebApi.OutboundHttpClientAuditLogger": "Warning"
+  //  }
+  //},
+  "Inbound": {
+    "Using": [ "Synapxe.Serilog.Sinks.AmazonSQS" ],
+    "AuditTo": [
+      {
+        "Name": "AmazonSQS",
+        "Args": {
+          "awsAccessKeyId": null,
+          "connectionString": "FhirEngineSerilogAuditInbound",
+          "fields": [
+            "Id:AuditLogId",
+            "CorrelationId:TraceId",
+            "EndDateTime:Timestamp",
+            "StartDateTime",
+            "CreatedBy:AppId",
+            "ClientUser_Id",
+            "ClientUser_Type",
+            "ClientTime",
+            "Method",
+            "Headers",
+            "Path",
+            "Query",
+            "Operation",
+            "Action",
+            "ActionType",
+            "Target_TypeName",
+            "Target_ResourceId",
+            "Target_VersionId",
+            "Target_Reference",
+            "Target_Display",
+            "ResponseStatus:StatusCode",
+            "Duration"
+          ]
+        }
+      }
+    ]
+  },
+  "Outbound": {
+    "Using": [ "Synapxe.Serilog.Sinks.AmazonSQS" ],
+    "AuditTo": [
+      {
+        "Name": "AmazonSQS",
+        "Args": {
+          "connectionString": "FhirEngineSerilogAuditOutbound",
+          "fields": [
+            "Id:AuditLogId",
+            "CorrelationId:TraceId",
+            "EndDateTime:Timestamp",
+            "StartDateTime",
+            "CreatedBy:AppId",
+            "ClientUser_Id",
+            "ClientUser_Type",
+            "ClientTime",
+            "Method",
+            "Headers",
+            "Path",
+            "Query",
+            "Operation",
+            "Action",
+            "ActionType",
+            "Target_TypeName",
+            "Target_ResourceId",
+            "Target_VersionId",
+            "Target_Reference",
+            "Target_Display",
+            "ResponseStatus:StatusCode",
+            "Duration"
+          ]
+        }
+      }
+    ]
+  }
+}
