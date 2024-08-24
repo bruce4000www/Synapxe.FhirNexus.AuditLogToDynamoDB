@@ -16,6 +16,8 @@ Create a test project from FhirNexus template and add the following changes to g
 
 Check the commit history of this project to see the changes details.
 
+Execute `FhirNexusAuditLogging.yaml` cloudformation template to create the required resources.
+
 ## Log to AWS CloudWatch
 1. Add nuget packages `Ihis.FhirEngine.WebApi.Extensions.AuditLogging.Serilog.Aws` and `Serilog.Sinks.AwsCloudWatch` to the project. 
 2. Setup AWS credentials in `launchSettings.json` file.

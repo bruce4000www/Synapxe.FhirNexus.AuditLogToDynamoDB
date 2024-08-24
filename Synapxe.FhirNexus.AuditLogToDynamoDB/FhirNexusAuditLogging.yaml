@@ -1,0 +1,135 @@
+Description: "This CloudFormation script is to create SQS, Lambda and DynamoDB required by FhirNexus Audit Logging"
+Resources:
+  FhirNexusAuditLoggingDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+      BillingMode: "PAY_PER_REQUEST"
+      TableName: "FhirEngineAuditDb"
+
+  LambdaManagedPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: WriteMessageFromSQSToDynamoDB
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "sqs:DeleteMessage"
+              - "sqs:ReceiveMessage"
+              - "sqs:GetQueueAttributes"
+              - "dynamodb:PutItem"
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogGroup"
+            Resource: "arn:aws:logs:ap-southeast-1:772633215649:*"
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource: "arn:aws:logs:ap-southeast-1:772633215649:log-group:/aws/lambda/FhirNexusAuditLogging:*"
+
+  LambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref LambdaManagedPolicy
+      RoleName: FhirNexusAuditLogging-role
+
+  FhirNexusAuditLoggingLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+
+          dynamodb = boto3.client('dynamodb')
+
+          def lambda_handler(event, context):
+              for record in event['Records']:
+                  message_body = json.loads(record['body'])
+                  start_datetime = message_body.get('StartDateTime', '')
+
+                  dynamodb.put_item(
+                      TableName='FhirEngineAuditDb',
+                      Item={
+                          'Id': {'S': message_body.get('Id', str(record['messageId']))},
+                          'CorrelationId': {'S': message_body.get('CorrelationId', '')},
+                          'EndDateTime': {'S': message_body.get('EndDateTime', '')},
+                          'StartDateTime': {'S': start_datetime},
+                          'CreatedBy': {'S': message_body.get('CreatedBy', '')},
+                          'ClientUser_Id': {'S': message_body.get('ClientUser_Id', '')},
+                          'ClientUser_Type': {'S': message_body.get('ClientUser_Type', '')},
+                          'ClientTime': {'S': message_body.get('ClientTime', '')},
+                          'Method': {'S': message_body.get('Method', '')},
+                          'Headers': {'SS': message_body.get('Headers', ['empty'])},
+                          'Path': {'S': message_body.get('Path', '')},
+                          'Query': {'S': message_body.get('Query', '')},
+                          'Operation': {'S': message_body.get('Operation', '')},
+                          'Action': {'S': message_body.get('Action', '')},
+                          'ActionType': {'S': message_body.get('ActionType', '')},
+                          'Target_TypeName': {'S': message_body.get('Target_TypeName', '')},
+                          'Target_ResourceId': {'S': message_body.get('Target_ResourceId', '')},
+                          'Target_VersionId': {'S': message_body.get('Target_VersionId', '')},
+                          'Target_Reference': {'S': message_body.get('Target_Reference', '')},
+                          'Target_Display': {'S': message_body.get('Target_Display', '')},
+                          'ResponseStatus': {'N': str(message_body.get('ResponseStatus', '-1'))},
+                          'Duration': {'N': str(message_body.get('Duration', '-1'))},
+                          'Source': {'S': record['eventSourceARN'].rsplit(":", 1)[-1]}
+                      }
+                  )
+      FunctionName: "FhirNexusAuditLogging"
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.12
+      Timeout: 30
+
+  FhirNexusAuditLoggingSQSInbound:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: fhirnexus-auditlog-inbound
+      DelaySeconds: 0
+      MaximumMessageSize: 262144
+      MessageRetentionPeriod: 345600
+      ReceiveMessageWaitTimeSeconds: 0
+      VisibilityTimeout: 30
+
+  FhirNexusAuditLoggingSQSOutbound:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: fhirnexus-auditlog-outbound
+      DelaySeconds: 0
+      MaximumMessageSize: 262144
+      MessageRetentionPeriod: 345600
+      ReceiveMessageWaitTimeSeconds: 0
+      VisibilityTimeout: 30
+
+  InboundLambdaTrigger:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt FhirNexusAuditLoggingSQSInbound.Arn
+      FunctionName: !Ref FhirNexusAuditLoggingLambda
+      BatchSize: 10
+
+  OutboundLambdaTrigger:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt FhirNexusAuditLoggingSQSOutbound.Arn
+      FunctionName: !Ref FhirNexusAuditLoggingLambda
+      BatchSize: 10
